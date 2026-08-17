@@ -113,7 +113,7 @@ function Index() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-3xl flex-col px-4 pb-6">
+    <main className="mx-auto flex h-screen w-full max-w-3xl flex-col px-4 pb-6">
       <Toaster />
 
       <header className="sticky top-0 z-10 -mx-4 border-b border-border/60 bg-background/80 px-4 py-4 backdrop-blur-md">
@@ -156,7 +156,7 @@ function Index() {
         </div>
       </header>
 
-      <section className="flex-1 space-y-5 py-6">
+      <section className="scrollbar-cyber flex-1 space-y-5 overflow-y-auto py-6">
         {messages.map((message) => (
           <MessageBubble key={message.id} message={message} />
         ))}
