@@ -57,7 +57,7 @@ export async function sendToBackend(params: {
   const response = await fetch(endpoint, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    signal,
+    signal: signal ?? null,
     body: JSON.stringify({
       message,
       query: message,
