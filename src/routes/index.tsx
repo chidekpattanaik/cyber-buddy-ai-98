@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { ArrowUp, FileText, ShieldCheck, Trash2, Wifi } from "lucide-react";
+import { Hexagon, MapPin, SendHorizonal, Target, Terminal } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
@@ -43,19 +43,17 @@ const GREETING: ChatMessage = {
   id: "greeting",
   role: "assistant",
   content:
-    "Hey! I'm **Riya** 👋 final-year cybersec student, currently running on too much coffee.\n\nGot a sketchy email, a weird link, or just a question about how some attack works? Paste it here and we'll pick it apart together.",
+    "Hey! I'm Riya. I'm currently surviving final-year cybersec life with coffee, Python, and a slightly unhealthy number of CTF tabs 😅 What are you working on?",
   at: Date.now(),
 };
 
-const SUGGESTIONS = [
-  "I got an email saying my bank account is blocked.",
-  "Is this link safe? bank-login-security.xyz",
-  "Explain ransomware like I'm 12",
-  "How do I make my passwords actually strong?",
-];
+const SUGGESTIONS = ["Explain phishing", "Suspicious email", "Start CTFs"];
 
-const SUMMARY_PROMPT =
-  "Can you wrap this up with a short incident summary — what happened, the risk level, and the next steps I should take?";
+const FACTS = [
+  { icon: MapPin, label: "Hyderabad, India" },
+  { icon: Terminal, label: "Python + Kali Linux" },
+  { icon: Target, label: "Future SOC analyst" },
+];
 
 function Index() {
   const [messages, setMessages] = useState<ChatMessage[]>([GREETING]);
@@ -113,36 +111,52 @@ function Index() {
   }
 
   return (
-    <main className="mx-auto flex h-screen w-full max-w-3xl flex-col px-4 pb-6">
+    <main className="mx-auto flex min-h-screen w-full max-w-6xl items-stretch p-4 md:p-8">
       <Toaster />
 
-      <header className="sticky top-0 z-10 -mx-4 border-b border-border/60 bg-background/80 px-4 py-4 backdrop-blur-md">
-        <div className="flex items-center gap-3">
-          <div className="glow-ring flex size-11 items-center justify-center rounded-xl bg-hero-glow text-primary">
-            <ShieldCheck className="size-6" />
+      <div className="grid w-full overflow-hidden rounded-3xl border border-border/70 bg-surface/40 shadow-[0_30px_80px_-40px_oklch(0_0_0/0.9)] md:grid-cols-[300px_1fr]">
+        {/* Profile panel */}
+        <aside className="flex flex-col gap-8 border-b border-border/70 bg-background/60 p-8 md:border-b-0 md:border-r">
+          <div className="flex items-center gap-2 text-primary">
+            <Hexagon className="size-4" />
+            <span className="font-mono text-xs font-semibold uppercase tracking-[0.3em]">
+              CyberShield
+            </span>
           </div>
-          <div className="min-w-0 flex-1">
-            <h1 className="text-glow font-mono text-lg font-bold tracking-tight">CyberShield AI</h1>
-            <p className="truncate text-xs text-muted-foreground">
-              Riya · cybersecurity student, Hyderabad ·{" "}
-              <span className={online === "down" ? "text-destructive" : "text-accent"}>
-                {online === "down" ? "backend unreachable" : "online"}
+
+          <div className="space-y-4">
+            <div className="glow-ring flex size-24 items-center justify-center rounded-full bg-hero-glow text-4xl font-semibold text-primary-foreground">
+              R
+            </div>
+            <div className="flex items-center gap-2">
+              <span
+                className={`size-2 rounded-full ${online === "down" ? "bg-destructive" : "bg-primary"}`}
+              />
+              <span className="font-mono text-xs text-muted-foreground">
+                {online === "down" ? "offline" : "online"}
               </span>
+            </div>
+            <div>
+              <h1 className="text-3xl font-semibold tracking-tight">Riya</h1>
+              <p className="mt-1 text-sm font-medium text-primary">
+                Fourth-year cybersecurity student
+              </p>
+            </div>
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              Mostly found decoding logs, learning CTF stuff, or looking for coffee.
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="gap-2 font-mono text-xs"
-              onClick={() => {
-                setMessages([{ ...GREETING, at: Date.now() }]);
-                sessionId.current = newId();
-              }}
-            >
-              <Trash2 className="size-3.5" />
-              <span className="hidden sm:inline">Reset</span>
-            </Button>
+
+          <ul className="space-y-3 border-t border-border/70 pt-6">
+            {FACTS.map(({ icon: Icon, label }) => (
+              <li key={label} className="flex items-center gap-3 text-sm text-muted-foreground">
+                <Icon className="size-4 text-primary/80" />
+                <span className="font-mono text-xs">{label}</span>
+              </li>
+            ))}
+          </ul>
+
+          <div className="mt-auto space-y-3 border-t border-border/70 pt-6">
             <EndpointDialog
               endpoint={endpoint}
               onSave={(value) => {
@@ -152,78 +166,85 @@ function Index() {
                 toast.success("Endpoint saved");
               }}
             />
+            <p className="font-mono text-[10px] uppercase leading-relaxed tracking-[0.2em] text-muted-foreground">
+              Masquerade &apos;26
+              <br />
+              The Turing Test
+            </p>
           </div>
-        </div>
-      </header>
+        </aside>
 
-      <section className="scrollbar-cyber flex-1 space-y-5 overflow-y-auto py-6">
-        {messages.map((message) => (
-          <MessageBubble key={message.id} message={message} />
-        ))}
-        {busy && <TypingBubble />}
-        <div ref={bottomRef} />
-      </section>
-
-      <div className="sticky bottom-0 -mx-4 space-y-3 bg-background/85 px-4 pb-2 pt-3 backdrop-blur-md">
-        {messages.length <= 1 && (
-          <div className="flex flex-wrap gap-2">
-            {SUGGESTIONS.map((suggestion) => (
-              <button
-                key={suggestion}
-                onClick={() => send(suggestion)}
-                className="rounded-full border border-border bg-surface px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
-              >
-                {suggestion}
-              </button>
-            ))}
-          </div>
-        )}
-
-        <div className="rounded-2xl border border-border bg-surface p-2 focus-within:border-primary/50 focus-within:shadow-[0_0_28px_-14px_var(--ring)]">
-          <Textarea
-            value={input}
-            onChange={(event) => setInput(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" && !event.shiftKey) {
-                event.preventDefault();
-                send(input);
-              }
-            }}
-            placeholder="Paste a suspicious email, link or ask anything security…"
-            rows={2}
-            className="min-h-[52px] resize-none border-0 bg-transparent font-mono text-sm shadow-none focus-visible:ring-0"
-          />
-          <div className="flex items-center justify-between gap-2 px-1 pb-1">
+        {/* Chat panel */}
+        <section className="flex min-h-[70vh] flex-col p-6 md:p-8">
+          <header className="flex items-start justify-between gap-4 border-b border-border/70 pb-5">
+            <div>
+              <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+                Secure chat
+              </p>
+              <h2 className="mt-1 text-2xl font-semibold tracking-tight">Talk to Riya</h2>
+            </div>
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
-              disabled={busy || messages.length <= 1}
-              onClick={() => send(SUMMARY_PROMPT)}
-              className="gap-2 font-mono text-xs text-muted-foreground"
+              className="rounded-full"
+              onClick={() => {
+                setMessages([{ ...GREETING, at: Date.now() }]);
+                sessionId.current = newId();
+              }}
             >
-              <FileText className="size-3.5" />
-              Incident summary
+              Clear chat
             </Button>
-            <div className="flex items-center gap-3">
-              <span className="hidden items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-muted-foreground sm:flex">
-                <Wifi className="size-3" />
-                {endpoint}
-              </span>
+          </header>
+
+          <div className="scrollbar-cyber flex-1 space-y-5 overflow-y-auto py-6">
+            {messages.map((message) => (
+              <MessageBubble key={message.id} message={message} />
+            ))}
+            {busy && <TypingBubble />}
+            <div ref={bottomRef} />
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex flex-wrap gap-2">
+              {SUGGESTIONS.map((suggestion) => (
+                <button
+                  key={suggestion}
+                  onClick={() => send(suggestion)}
+                  className="rounded-full border border-border bg-surface px-4 py-1.5 text-xs text-muted-foreground transition-colors hover:border-primary/60 hover:text-foreground"
+                >
+                  {suggestion}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex items-end gap-3 rounded-2xl border border-border bg-surface p-2 pl-4 focus-within:border-primary/50">
+              <Textarea
+                value={input}
+                onChange={(event) => setInput(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" && !event.shiftKey) {
+                    event.preventDefault();
+                    send(input);
+                  }
+                }}
+                placeholder="Message Riya…"
+                rows={1}
+                className="min-h-[44px] resize-none border-0 bg-transparent p-0 py-3 text-sm shadow-none focus-visible:ring-0"
+              />
               <Button
-                size="icon"
                 disabled={busy || !input.trim()}
                 onClick={() => send(input)}
-                className="size-9 rounded-xl"
-                aria-label="Send message"
+                className="h-10 gap-2 rounded-xl px-5"
               >
-                <ArrowUp className="size-4" />
+                Send
+                <SendHorizonal className="size-4" />
               </Button>
             </div>
+            <p className="text-center font-mono text-[10px] text-muted-foreground">
+              Press Enter to send · Shift + Enter for a new line
+            </p>
           </div>
-        </div>
-        <p className="text-center font-mono text-[10px] text-muted-foreground">
-          Enter to send · Shift+Enter for a new line
-        </p>
+        </section>
       </div>
     </main>
   );
