@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Coffee, Hexagon, MapPin, SendHorizonal, Target, Terminal } from "lucide-react";
+import { Hexagon, MapPin, SendHorizonal, Target, Terminal } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
