@@ -33,9 +33,11 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
             <ReactMarkdown>{message.content}</ReactMarkdown>
           </div>
         </div>
-        <span className="px-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-          {isUser ? `${time(message.at)} · seen` : time(message.at)}
-        </span>
+        {message.id !== "greeting" && (
+          <span className="px-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+            {isUser ? `${time(message.at)} · seen` : time(message.at)}
+          </span>
+        )}
       </div>
     </div>
   );
