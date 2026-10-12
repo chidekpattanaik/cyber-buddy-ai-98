@@ -149,3 +149,18 @@ curl -X POST https://your-backend.onrender.com/chat \
 - [x] CORS headers (`Access-Control-Allow-Origin: *`) are active so judges can interact through their platform.
 - [x] Persona matches **Riya** (21-year-old student from Hyderabad, cybersecurity focus, natural conversational flow).
 - [x] Working chat interface running at live URL or local machine during evaluation.
+
+---
+
+## 🔧 Troubleshooting: Vercel TanStack Start Vulnerability (`CVE-2026-102989`)
+
+If Vercel previously blocked deployment with:
+`@tanstack/start-server-core contains a known cross-site scripting vulnerability (CVE-2026-102989)`
+
+**Solution already applied in this repo:**
+- `@tanstack/react-start` has been updated to `^1.168.61`
+- `@tanstack/react-router` has been updated to `^1.170.42`
+- `@tanstack/router-plugin` has been updated to `^1.168.43`
+- `package.json` includes npm `overrides` locking `@tanstack/start-server-core` to `>=1.169.40`
+- If you ever need an emergency bypass on Vercel without updating dependencies, set environment variable `DANGEROUSLY_DEPLOY_VULNERABLE_TANSTACK_START_XSS=1` in Vercel project settings.
+
