@@ -1,0 +1,28 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cybershield-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - PORT=8000
+    restart: unless-stopped
+
+  frontend:
+    image: node:22-alpine
+    container_name: cybershield-frontend
+    working_dir: /app
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_BACKEND_URL=http://localhost:8000/chat
+    command: sh -c "npm install && npm run dev -- --port 3000 --host 0.0.0.0"
+    depends_on:
+      - backend
+    restart: unless-stopped

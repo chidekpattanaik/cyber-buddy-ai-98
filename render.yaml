@@ -1,0 +1,33 @@
+services:
+  # 1. FastAPI Python Backend Service
+  - type: web
+    name: cybershield-backend
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: GEMINI_API_KEY
+        sync: false
+        generateValue: false
+
+  # 2. Vite React Frontend (Static Site on Render)
+  - type: web
+    name: cybershield-frontend
+    runtime: static
+    plan: free
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./.output/public
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_BACKEND_URL
+        fromService:
+          type: web
+          name: cybershield-backend
+          property: host
